@@ -20,7 +20,8 @@ RUN mkdir -p static/uploads static/enhanced static/histograms
 EXPOSE 5001
 
 # Prod: gunicorn with 2 workers, 120s timeout for image processing
-CMD ["gunicorn", "app:app", "-w", "2", "-b", "0.0.0.0:5001", "--timeout", "120", "--access-logfile", "-"]
+# Railway sets PORT env var; gunicorn must bind to it
+CMD exec gunicorn app:app -w 2 -b 0.0.0.0:${PORT:-5001} --timeout 120 --access-logfile -
 
 # Dev override: python app.py
 # CMD ["python", "app.py"]

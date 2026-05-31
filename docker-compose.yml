@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  photolens:
+    build: .
+    ports:
+      - "${PORT:-5001}:5001"
+    environment:
+      - PORT=${PORT:-5001}
+      - SECRET_KEY=${SECRET_KEY:-photo-lens-production-change-me}
+      - FLASK_DEBUG=${FLASK_DEBUG:-0}
+    volumes:
+      - ./static/uploads:/app/static/uploads
+      - ./static/enhanced:/app/static/enhanced
+      - ./static/histograms:/app/static/histograms
+      - ./static/shares:/app/static/shares
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoLens - 智能照片评分与后期增强</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+                <circle cx="20" cy="11" r="3.5" stroke="currentColor" stroke-width="2"/>
+                <path d="M2 26l7-9 5 6 4-5 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>PhotoLens</span>
+        </div>
+        <p class="subtitle">基于 PPA 国际摄影标准的 8 维专业评分 · 6 种后期风格 · MBTI 摄影人格 · 受众分析</p>
+    </header>
+
+    <!-- Feature Pills -->
+    <div class="feature-strip">
+        <div class="feature-pill">8 维专业评分</div>
+        <div class="feature-pill">6 种后期增强</div>
+        <div class="feature-pill">MBTI 摄影人格</div>
+        <div class="feature-pill">照片情绪分析</div>
+        <div class="feature-pill">受众画像</div>
+        <div class="feature-pill">直方图对比</div>
+        <div class="feature-pill">拖拽滑动对比</div>
+        <div class="feature-pill">Ctrl+V 粘贴</div>
+    </div>
+
+    <main class="main">
+
+        <!-- Upload Section -->
+        <section id="upload-section" class="card upload-card">
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-icon">
+                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 12v28M18 26l14-14 14 14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 42v6a4 4 0 004 4h32a4 4 0 004-4v-6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <p class="drop-text">拖放照片到这里，或点击选择文件</p>
+                <p class="drop-hint">JPG / PNG / WebP · 最大 20MB · 支持 Ctrl+V 粘贴</p>
+                <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" hidden>
+            </div>
+            <div id="upload-preview" class="upload-preview hidden">
+                <img id="preview-img" src="" alt="预览">
+                <div class="preview-actions">
+                    <button id="reupload-btn" class="btn btn-outline">重新选择</button>
+                    <button id="analyze-btn" class="btn btn-primary">
+                        <span class="btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M10 5v5l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        开始分析
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section id="loading-section" class="card hidden">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" id="loading-text">正在分析您的照片...</p>
+            <div class="loading-steps">
+                <span class="load-step" id="step-score">评分分析</span>
+                <span class="load-step" id="step-enhance">生成增强</span>
+                <span class="load-step" id="step-done">完成</span>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="hidden">
+
+            <!-- Overall Score -->
+            <div class="overall-card card card-lift">
+                <div class="result-toolbar">
+                    <button id="share-btn" class="btn btn-outline btn-sm" style="margin-right:8px">分享结果</button>
+                    <button id="new-photo-btn" class="btn btn-outline btn-sm">重新选择照片</button>
+                </div>
+                <div class="overall-layout">
+                    <div class="overall-score-ring">
+                        <svg viewBox="0 0 120 120" class="score-ring">
+                            <circle cx="60" cy="60" r="52" class="ring-bg"/>
+                            <circle cx="60" cy="60" r="52" class="ring-progress" id="ring-progress"/>
+                        </svg>
+                        <div class="score-inner">
+                            <span class="score-number" id="overall-score">--</span>
+                            <span class="score-label" id="overall-label">--</span>
+                        </div>
+                    </div>
+                    <div class="overall-info">
+                        <h2>综合评分</h2>
+                        <p id="overall-summary"></p>
+                        <div class="rec-banner" id="rec-banner">
+                            <span class="rec-star">★</span>
+                            <span id="rec-text"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Photo + Analysis -->
+            <div class="results-grid">
+
+                <!-- Left: Photo with Slider Comparison -->
+                <div class="card result-panel photo-panel card-lift">
+                    <h3 class="panel-title">对比预览</h3>
+                    <div class="slider-compare tilt-effect" id="slider-compare">
+                        <div class="slider-compare-wrapper">
+                            <img id="compare-before" src="" alt="原图" class="slider-img slider-img-before">
+                            <div class="slider-clip" id="slider-clip">
+                                <img id="compare-after" src="" alt="增强" class="slider-img slider-img-after">
+                            </div>
+                            <div class="slider-handle" id="slider-handle">
+                                <div class="slider-line"></div>
+                                <div class="slider-arrows">
+                                    <svg width="8" height="16" viewBox="0 0 8 16"><path d="M1 1l6 7-6 7" stroke="#fff" stroke-width="1.5" fill="none"/></svg>
+                                    <svg width="8" height="16" viewBox="0 0 8 16"><path d="M7 1l-6 7 6 7" stroke="#fff" stroke-width="1.5" fill="none"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slider-labels">
+                        <span class="slider-label-before">原图</span>
+                        <span class="slider-label-after">增强后</span>
+                    </div>
+
+                    <!-- Intensity Slider -->
+                    <div class="intensity-control" id="intensity-control">
+                        <div class="intensity-header">
+                            <span class="intensity-label">增强强度</span>
+                            <span class="intensity-value" id="intensity-value">100%</span>
+                        </div>
+                        <input type="range" id="intensity-slider" class="intensity-slider" min="10" max="100" value="100" step="5">
+                    </div>
+
+                    <!-- Style Tabs -->
+                    <div class="style-tabs" id="style-tabs"></div>
+                    <p class="style-desc" id="style-desc"></p>
+                    <button id="download-btn" class="btn btn-primary btn-sm">下载增强图</button>
+                </div>
+
+                <!-- Right: Analysis Details -->
+                <div class="card result-panel analysis-panel">
+                    <h3 class="panel-title">评分详情</h3>
+                    <div id="radar-chart"></div>
+                    <div id="dimensions-container" class="dimensions-list"></div>
+
+                    <!-- Histogram Comparison -->
+                    <div class="histogram-section">
+                        <h4 class="subsection-title">直方图对比</h4>
+                        <div class="histogram-compare">
+                            <div class="histogram-box">
+                                <p class="histogram-label">原图</p>
+                                <img id="compare-hist-original" src="" alt="原图直方图">
+                            </div>
+                            <div class="histogram-box">
+                                <p class="histogram-label">增强后</p>
+                                <img id="compare-hist-enhanced" src="" alt="增强后直方图">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Entertainment Section -->
+            <div id="entertainment-section" class="card entertainment-card hidden">
+                <h3 class="panel-title">🎯 趣味分析</h3>
+
+                <!-- Mood Banner -->
+                <div class="mood-banner" id="mood-banner">
+                    <span class="mood-emoji" id="mood-emoji"></span>
+                    <div class="mood-info">
+                        <span class="mood-name" id="mood-name"></span>
+                        <span class="mood-music" id="mood-music"></span>
+                    </div>
+                </div>
+                <p class="mood-phrase" id="mood-phrase"></p>
+
+                <div class="entertainment-grid">
+                    <!-- MBTI -->
+                    <div class="mbti-card">
+                        <div class="mbti-header">
+                            <span class="mbti-badge" id="mbti-type">----</span>
+                            <div>
+                                <span class="mbti-persona" id="mbti-persona"></span>
+                                <span class="mbti-label">摄影人格</span>
+                            </div>
+                        </div>
+                        <p class="mbti-desc" id="mbti-desc"></p>
+                        <div class="mbti-dims" id="mbti-dims"></div>
+                        <div class="mbti-match" id="mbti-match"></div>
+                    </div>
+                    <!-- Audience -->
+                    <div class="audience-card">
+                        <div class="audience-header">
+                            <span class="audience-category" id="audience-category">---</span>
+                            <span class="audience-label">受众画像</span>
+                        </div>
+                        <div class="audience-meta" id="audience-meta"></div>
+                        <div class="audience-traits" id="audience-traits"></div>
+                        <div class="audience-interests" id="audience-interests"></div>
+                        <p class="audience-usecase" id="audience-usecase"></p>
+                        <div class="audience-also" id="audience-also"></div>
+                    </div>
+                </div>
+                <p class="entertainment-disclaimer">⚠️ 以上分析仅供娱乐，不具备心理学诊断意义</p>
+            </div>
+        </section>
+
+        <!-- Error State -->
+        <section id="error-section" class="card hidden">
+            <div class="error-icon" id="error-icon">!</div>
+            <p id="error-message" class="error-text"></p>
+            <p id="error-detail" class="error-detail"></p>
+            <button id="retry-btn" class="btn btn-outline">重新上传</button>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>PhotoLens — AI驱动的智能照片评分与后期增强工具</p>
+        <p style="font-size:11px;color:var(--text-tertiary);margin-top:6px">
+            上传的照片仅用于本次分析，1小时后自动从服务器删除 · 不会用于训练或第三方存储
+        </p>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/interactions.js"></script>
+</body>
+</html>

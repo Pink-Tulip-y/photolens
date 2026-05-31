@@ -1,0 +1,22 @@
+__pycache__
+*.pyc
+*.pyo
+venv/
+.git/
+.gitignore
+*.bat
+*.vbs
+.env
+DEPLOY.md
+CLAUDE.md
+node_modules
+.DS_Store
+Thumbs.db
+# Keep static dirs but not their content (mounted as volumes in production)
+static/uploads/*
+static/enhanced/*
+static/histograms/*
+static/shares/*
+!static/uploads/.gitkeep
+# Don't ignore share JSONs at build time — they're needed as templates
+# But they'll be mounted via volume at runtime

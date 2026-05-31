@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoLens — {{ data.overall }}分 {{ data.overall_label }}</title>
+    <meta property="og:title" content="PhotoLens — {{ data.overall }}分 {{ data.overall_label }}">
+    <meta property="og:description" content="{{ data.summary }}">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .share-page { max-width: 680px; margin: 60px auto; padding: 0 24px 80px; }
+        .share-header { text-align: center; margin-bottom: 32px; }
+        .share-header h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+        .share-header p { color: var(--text-tertiary); font-size: 14px; }
+        .share-score { display: flex; align-items: center; justify-content: center; gap: 24px; margin: 32px 0; }
+        .share-score-num { font-family: var(--font-display); font-size: 72px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+        .share-grade { font-size: 18px; font-weight: 600; color: var(--text-secondary); }
+        .share-summary { color: var(--text-secondary); font-size: 15px; line-height: 1.7; margin: 16px 0; }
+
+        .share-section { margin: 28px 0; }
+        .share-section h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text); letter-spacing: -0.01em; }
+
+        .share-dims { display: flex; flex-direction: column; gap: 8px; }
+        .share-dim { padding: 12px 14px; background: var(--bg-alt); border-radius: var(--radius-sm); }
+        .share-dim-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .share-dim-name { font-size: 13px; font-weight: 600; color: var(--text); }
+        .share-dim-score { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+        .share-dim-bar { height: 4px; background: #e8e8ed; border-radius: 2px; overflow: hidden; }
+        .share-dim-fill { height: 100%; border-radius: 2px; }
+        .share-dim-fb { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+        .share-breakdown { margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--border-light); display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; }
+        .share-bd-item { display: flex; justify-content: space-between; color: var(--text-tertiary); }
+        .share-bd-item .bd-label { color: var(--text-secondary); }
+        .share-bd-item .bd-val { font-weight: 600; }
+        .share-bd-item .bd-detail { grid-column: 1 / -1; font-size: 10px; color: var(--text-tertiary); }
+
+        .share-mood { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--bg-alt); border-radius: var(--radius-sm); margin-bottom: 16px; }
+        .share-mood-emoji { font-size: 36px; }
+        .share-mood-name { font-size: 18px; font-weight: 600; }
+        .share-mood-music { font-size: 12px; color: var(--text-tertiary); }
+        .share-mood-phrase { font-size: 13px; color: var(--text-secondary); font-style: italic; }
+
+        .share-mbti { padding: 16px; background: var(--bg-alt); border-radius: var(--radius-sm); }
+        .share-mbti-badge { display: inline-block; font-family: var(--font-display); font-size: 28px; font-weight: 800; letter-spacing: 3px; color: var(--blue); margin-bottom: 8px; }
+        .share-mbti-persona { font-size: 15px; font-weight: 600; color: var(--text); }
+        .share-mbti-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-top: 6px; }
+        .share-mbti-match { font-size: 11px; color: var(--text-tertiary); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light); }
+
+        .share-rec { margin-top: 16px; padding: 14px 16px; background: var(--blue-light); border-radius: var(--radius-sm); font-size: 13px; color: var(--blue); font-weight: 500; }
+
+        .share-cta { text-align: center; margin-top: 40px; padding: 28px; background: var(--bg-alt); border-radius: var(--radius-md); }
+        .share-cta p { color: var(--text-secondary); font-size: 14px; }
+        .share-cta a { display: inline-block; padding: 12px 32px; background: var(--blue); color: #fff; border-radius: 980px; text-decoration: none; font-weight: 600; margin-top: 12px; font-family: var(--font-body); transition: all var(--transition-fast); }
+        .share-cta a:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,113,227,0.4); }
+
+        @media (max-width: 500px) {
+            .share-score-num { font-size: 56px; }
+            .share-breakdown { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="share-page">
+    <div class="share-header">
+        <h1>📷 PhotoLens 评分报告</h1>
+        <p>AI 专业摄影评分 · 8 维分析{% if data.mbti and data.mbti.mbti %} · {{ data.mbti.mbti }} 人格{% endif %}</p>
+    </div>
+
+    <div class="share-score">
+        <div>
+            <div class="share-score-num" style="color:{{ data.overall_color or '#0071e3' }}">{{ data.overall }}</div>
+            <div class="share-grade">{{ data.overall_label }} · {{ data.overall_desc or '' }}</div>
+        </div>
+    </div>
+
+    <p class="share-summary">{{ data.summary }}</p>
+
+    {% if data.recommended_style %}
+    <div class="share-rec">🎯 推荐后期：{{ data.recommended_style or '' }}{% if data.recommended_reason %} — {{ data.recommended_reason }}{% endif %}</div>
+    {% endif %}
+
+    {% if data.mood %}
+    <div class="share-section">
+        <h3>🎨 照片情绪</h3>
+        <div class="share-mood">
+            <span class="share-mood-emoji">{{ data.mood.emoji or '' }}</span>
+            <div>
+                <div class="share-mood-name">{{ data.mood.mood or '' }}</div>
+                {% if data.mood.music %}<div class="share-mood-music">🎵 {{ data.mood.music }}</div>{% endif %}
+                {% if data.mood.phrase %}<div class="share-mood-phrase">{{ data.mood.phrase }}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if data.mbti and data.mbti.mbti %}
+    <div class="share-section">
+        <h3>🧠 摄影人格</h3>
+        <div class="share-mbti">
+            <div class="share-mbti-badge">{{ data.mbti.mbti }}</div>
+            <div class="share-mbti-persona">{{ data.mbti.persona or '' }}</div>
+            {% if data.mbti.persona_desc %}<div class="share-mbti-desc">{{ data.mbti.persona_desc }}</div>{% endif %}
+            {% if data.mbti.match_photographer %}<div class="share-mbti-match">🎞️ 灵魂共鸣的摄影师：{{ data.mbti.match_photographer }}</div>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if data.dimensions %}
+    <div class="share-section">
+        <h3>📊 评分详情</h3>
+        <div class="share-dims">
+            {% for dim in data.dimensions %}
+            {% set color = '#34c759' if dim.score >= 85 else '#0071e3' if dim.score >= 70 else '#ff9f0a' if dim.score >= 55 else '#ff3b30' %}
+            <div class="share-dim">
+                <div class="share-dim-header">
+                    <span class="share-dim-name">{{ dim.name }} <span style="font-size:10px;color:var(--text-tertiary)">权重{{ dim.weight or 12 }}%</span></span>
+                    <span class="share-dim-score" style="color:{{ color }}">{{ dim.score }}</span>
+                </div>
+                <div class="share-dim-bar"><div class="share-dim-fill" style="width:{{ dim.score }}%;background:{{ color }}"></div></div>
+                {% if dim.feedback %}<div class="share-dim-fb">{{ dim.feedback }}</div>{% endif %}
+                {% if dim.breakdown %}
+                <div class="share-breakdown">
+                    {% for b in dim.breakdown %}
+                    <div class="share-bd-item">
+                        <span class="bd-label">{{ b.label }}</span>
+                        <span class="bd-val" style="color:{{ '#34c759' if b.ok else '#ff9f0a' }}">{{ b.value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="share-cta">
+        <p>想给你的照片也做个专业评分？</p>
+        <a href="/">免费分析我的照片 →</a>
+    </div>
+</div>
+</body>
+</html>

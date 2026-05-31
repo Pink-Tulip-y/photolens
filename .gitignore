@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+.DS_Store
+Thumbs.db
+static/uploads/*
+static/enhanced/*
+static/histograms/*
+static/shares/*
+!static/uploads/.gitkeep
+!static/enhanced/.gitkeep
+!static/histograms/.gitkeep
+!static/shares/.gitkeep
